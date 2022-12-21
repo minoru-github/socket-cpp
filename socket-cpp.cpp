@@ -5,27 +5,35 @@
 
 #pragma comment(lib,"Ws2_32.lib")
 
+int initialize();
 int client();
 
 int main()
 {
+    const int err_initialize = initialize();
     const int err_client = client();
 
     return 0;
 }
 
-int client() {
+int initialize() {
     WSADATA data{};
-    const int err_startup = WSAStartup(MAKEWORD(2, 0), &data);
+    const auto version_requested = MAKEWORD(2, 0);
+    // WSAStartupでWinsockの初期化を行う。
+    // Winsockアプリの最初にWSAStartupは行う必要がある。
+    // https://learn.microsoft.com/ja-jp/windows/win32/winsock/initializing-winsock
+    const int err_startup = WSAStartup(version_requested, &data);
     if (err_startup) {
         std::cerr << "can't startup. error: " + std::to_string(err_startup);
-        return err_startup;
     }
+    return err_startup;
+}
 
-    const std::string server_ip = "127.0.0.1";
-    constexpr int address_family = AF_INET;
-    constexpr int type = SOCK_STREAM;
-    constexpr int protocol = IPPROTO_HOPOPTS;
+const std::string server_ip = "127.0.0.1";
+constexpr int address_family = AF_INET;
+constexpr int type = SOCK_STREAM;
+constexpr int protocol = IPPROTO_HOPOPTS;
+int client() {
     sockaddr_in addr{};
     addr.sin_port = htons(8080);
     addr.sin_family = AF_INET;

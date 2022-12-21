@@ -1,20 +1,52 @@
-﻿// socket-cpp.cpp : このファイルには 'main' 関数が含まれています。プログラム実行の開始と終了がそこで行われます。
-//
+﻿#include <iostream>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <string>
 
-#include <iostream>
+#pragma comment(lib,"Ws2_32.lib")
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    WSADATA data{};
+    const auto err_startup = WSAStartup(MAKEWORD(2, 0), &data);
+    if (err_startup) {
+        std::cerr << "can't startup. error: " + std::to_string(err_startup);
+        return err_startup;
+    }
+
+    const auto server_ip = "127.0.0.1";
+    constexpr int address_family = AF_INET;
+    constexpr int type = SOCK_STREAM;
+    constexpr int protocol = IPPROTO_HOPOPTS;
+    sockaddr_in addr{};
+    addr.sin_port = htons(8080);
+    addr.sin_family = AF_INET;
+
+    // IPアドレスをバイナリ形式に変換
+    inet_pton(addr.sin_family, server_ip, &addr.sin_addr);
+
+    const SOCKET sock = socket(address_family, type, protocol);
+    if (sock == INVALID_SOCKET) {
+        std::cerr << "can't create socket.";
+        return 1;
+    }
+
+    const auto namelen = sizeof(addr);
+    const auto err_connect = connect(sock, (sockaddr*)&addr, static_cast<int>(namelen));
+    if (err_connect) {
+        std::cerr << "can't connect. error: " + std::to_string(err_connect);
+        return err_connect;
+    }
+
+    const std::string msg("hello world\n");
+    const auto err_send = send(sock, msg.c_str(), msg.length(), 0);
+    if (err_send == SOCKET_ERROR) {
+        std::cerr << "can't send message. error: " + std::to_string(err_send);
+        return err_send;
+    }
+
+    closesocket(sock);
+    WSACleanup();
+
+    return 0;
 }
-
-// プログラムの実行: Ctrl + F5 または [デバッグ] > [デバッグなしで開始] メニュー
-// プログラムのデバッグ: F5 または [デバッグ] > [デバッグの開始] メニュー
-
-// 作業を開始するためのヒント: 
-//    1. ソリューション エクスプローラー ウィンドウを使用してファイルを追加/管理します 
-//   2. チーム エクスプローラー ウィンドウを使用してソース管理に接続します
-//   3. 出力ウィンドウを使用して、ビルド出力とその他のメッセージを表示します
-//   4. エラー一覧ウィンドウを使用してエラーを表示します
-//   5. [プロジェクト] > [新しい項目の追加] と移動して新しいコード ファイルを作成するか、[プロジェクト] > [既存の項目の追加] と移動して既存のコード ファイルをプロジェクトに追加します
-//   6. 後ほどこのプロジェクトを再び開く場合、[ファイル] > [開く] > [プロジェクト] と移動して .sln ファイルを選択します

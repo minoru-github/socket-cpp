@@ -5,8 +5,16 @@
 
 #pragma comment(lib,"Ws2_32.lib")
 
+int client();
+
 int main()
 {
+    const int err_client = client();
+
+    return 0;
+}
+
+int client() {
     WSADATA data{};
     const int err_startup = WSAStartup(MAKEWORD(2, 0), &data);
     if (err_startup) {
@@ -39,7 +47,7 @@ int main()
     }
 
     const std::string msg = "hello world\n";
-    const int err_send = send(sock, msg.c_str(), msg.length(), 0);
+    const int err_send = send(sock, msg.c_str(), static_cast<int>(msg.length()), 0);
     if (err_send == SOCKET_ERROR) {
         std::cerr << "can't send message. error: " + std::to_string(err_send);
         return err_send;
@@ -47,6 +55,4 @@ int main()
 
     closesocket(sock);
     WSACleanup();
-
-    return 0;
 }

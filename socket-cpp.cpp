@@ -14,32 +14,38 @@ int main()
         return err_startup;
     }
 
-    const char* hostname = "localhost";
-    const char* service = "80";
-    addrinfo hints{};
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_family = AF_INET;
+    const auto server_ip = "127.0.0.1";
+    constexpr int address_family = AF_INET;
+    constexpr int type = SOCK_STREAM;
+    constexpr int protocol = IPPROTO_HOPOPTS;
+    sockaddr_in addr{};
+    addr.sin_port = htons(8080);
+    addr.sin_family = AF_INET;
 
-    addrinfo* res = nullptr;
-    const auto err_getaddrinfo = getaddrinfo(hostname, service, &hints, &res);
-    if (err_getaddrinfo) {
-        std::cerr << "can't getaddrinfo. error: " + std::to_string(err_getaddrinfo);
-        return err_getaddrinfo;
-    }
+    // IPアドレスをバイナリ形式に変換
+    inet_pton(addr.sin_family, server_ip, &addr.sin_addr);
 
-    const SOCKET sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+    const SOCKET sock = socket(address_family, type, protocol);
     if (sock == INVALID_SOCKET) {
         std::cerr << "can't create socket.";
         return 1;
     }
 
-    const auto err_connect = connect(sock, res->ai_addr, static_cast<int>(res->ai_addrlen));
+    const auto namelen = sizeof(addr);
+    const auto err_connect = connect(sock, (sockaddr*)&addr, static_cast<int>(namelen));
     if (err_connect) {
         std::cerr << "can't connect. error: " + std::to_string(err_connect);
         return err_connect;
     }
 
-    freeaddrinfo(res);
+    const std::string msg("hello world\n");
+    const auto err_send = send(sock, msg.c_str(), msg.length(), 0);
+    if (err_send == SOCKET_ERROR) {
+        std::cerr << "can't send message. error: " + std::to_string(err_send);
+        return err_send;
+    }
+
+    closesocket(sock);
     WSACleanup();
 
     return 0;

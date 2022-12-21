@@ -8,13 +8,13 @@
 int main()
 {
     WSADATA data{};
-    const auto err_startup = WSAStartup(MAKEWORD(2, 0), &data);
+    const int err_startup = WSAStartup(MAKEWORD(2, 0), &data);
     if (err_startup) {
         std::cerr << "can't startup. error: " + std::to_string(err_startup);
         return err_startup;
     }
 
-    const auto server_ip = "127.0.0.1";
+    const std::string server_ip = "127.0.0.1";
     constexpr int address_family = AF_INET;
     constexpr int type = SOCK_STREAM;
     constexpr int protocol = IPPROTO_HOPOPTS;
@@ -23,7 +23,7 @@ int main()
     addr.sin_family = AF_INET;
 
     // IPアドレスをバイナリ形式に変換
-    inet_pton(addr.sin_family, server_ip, &addr.sin_addr);
+    inet_pton(addr.sin_family, server_ip.c_str(), &addr.sin_addr);
 
     const SOCKET sock = socket(address_family, type, protocol);
     if (sock == INVALID_SOCKET) {
@@ -32,14 +32,14 @@ int main()
     }
 
     const auto namelen = sizeof(addr);
-    const auto err_connect = connect(sock, (sockaddr*)&addr, static_cast<int>(namelen));
+    const int err_connect = connect(sock, (sockaddr*)&addr, static_cast<int>(namelen));
     if (err_connect) {
         std::cerr << "can't connect. error: " + std::to_string(err_connect);
         return err_connect;
     }
 
-    const std::string msg("hello world\n");
-    const auto err_send = send(sock, msg.c_str(), msg.length(), 0);
+    const std::string msg = "hello world\n";
+    const int err_send = send(sock, msg.c_str(), msg.length(), 0);
     if (err_send == SOCKET_ERROR) {
         std::cerr << "can't send message. error: " + std::to_string(err_send);
         return err_send;

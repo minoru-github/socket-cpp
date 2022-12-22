@@ -7,6 +7,10 @@
 
 const int initialize();
 const sockaddr_in create_ip_address();
+const int create_connect(
+    const SOCKET sock,
+    const sockaddr_in& addr
+);
 const int client();
 
 int main()
@@ -47,6 +51,29 @@ const sockaddr_in create_ip_address()
     return addr;
 }
 
+const int create_connect(
+    const SOCKET sock,
+    const sockaddr_in& addr
+) {
+    const auto namelen = sizeof(addr);
+    const int err_connect = connect(sock, (sockaddr*)&addr, static_cast<int>(namelen));
+    if (err_connect) {
+        std::cerr << "can't connect. error: " + std::to_string(err_connect);
+    }
+    return err_connect;
+}
+
+const int send_msg(
+    const SOCKET sock,
+    const std::string msg
+) {
+    const int err_send = send(sock, msg.c_str(), static_cast<int>(msg.length()), 0);
+    if (err_send == SOCKET_ERROR) {
+        std::cerr << "can't send message. error: " + std::to_string(err_send);
+    }
+        return err_send;
+}
+
 const int client() {
     const auto addr = create_ip_address();
 
@@ -56,20 +83,19 @@ const int client() {
         return 1;
     }
 
-    const auto namelen = sizeof(addr);
-    const int err_connect = connect(sock, (sockaddr*)&addr, static_cast<int>(namelen));
+    const int err_connect = create_connect(sock, addr);
     if (err_connect) {
-        std::cerr << "can't connect. error: " + std::to_string(err_connect);
         return err_connect;
     }
 
-    const std::string msg = "hello world\n";
-    const int err_send = send(sock, msg.c_str(), static_cast<int>(msg.length()), 0);
-    if (err_send == SOCKET_ERROR) {
-        std::cerr << "can't send message. error: " + std::to_string(err_send);
+    const int err_send = send_msg(sock, "hello world\n");
+    if (err_send) {
         return err_send;
     }
 
     closesocket(sock);
+
     WSACleanup();
+
+    return 0;
 }

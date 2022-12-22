@@ -7,10 +7,7 @@
 
 const int initialize();
 const sockaddr_in create_ip_address();
-const int create_connect(
-    const SOCKET sock,
-    const sockaddr_in& addr
-);
+const int create_connect(const SOCKET sock);
 const int client();
 
 int main()
@@ -51,10 +48,9 @@ const sockaddr_in create_ip_address()
     return addr;
 }
 
-const int create_connect(
-    const SOCKET sock,
-    const sockaddr_in& addr
-) {
+const int create_connect(const SOCKET sock) {
+    const auto addr = create_ip_address();
+
     const auto namelen = sizeof(addr);
     const int err_connect = connect(sock, (sockaddr*)&addr, static_cast<int>(namelen));
     if (err_connect) {
@@ -75,7 +71,6 @@ const int send_msg(
 }
 
 const int client() {
-    const auto addr = create_ip_address();
 
     const SOCKET sock = socket(address_family, type, protocol);
     if (sock == INVALID_SOCKET) {
@@ -83,7 +78,7 @@ const int client() {
         return 1;
     }
 
-    const int err_connect = create_connect(sock, addr);
+    const int err_connect = create_connect(sock);
     if (err_connect) {
         return err_connect;
     }

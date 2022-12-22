@@ -106,6 +106,7 @@ const SOCKET accept(const SOCKET listen_sock) {
     }
     else {
         std::cerr << "Client connected." << std::endl;
+        closesocket(listen_sock);
     }
     return accpet_socket;
 }
@@ -179,12 +180,35 @@ void server() {
         return;
     }
 
-    const SOCKET accpet_socket = accept(listen_sock);
-    if (accpet_socket == INVALID_SOCKET) {
+    const SOCKET sock = accept(listen_sock);
+    if (sock == INVALID_SOCKET) {
         return;
     }
 
-    finalize_socket_communication(listen_sock);
+    constexpr size_t default_buflen = 512;
+    char recvbuf[default_buflen] = {0};
+    int recvbuflen = default_buflen;
+    while (1) {
+        const int received_size = recv(sock, recvbuf, recvbuflen, 0);
+        std::cerr << "received size: " + std::to_string(received_size) << std::endl;
+        if (received_size > 0) {
+            const std::string msg = recvbuf;
+            std::cerr << "received msg: " + msg << std::endl;
+            const int err_send = send_msg(sock, msg + "\n");
+            if (err_send) {
+                return;
+            }
+        }
+        else if (received_size == 0) {
+            finalize_socket_communication(sock);
+            break;
+        }
+        else {
+            std::cerr << "can't receive message. error: " + std::to_string(WSAGetLastError());
+            finalize_socket_communication(sock);
+            break;
+        }
+    }
 
     return;
 }

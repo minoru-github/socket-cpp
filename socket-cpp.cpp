@@ -5,8 +5,9 @@
 
 #pragma comment(lib,"Ws2_32.lib")
 
-int initialize();
-int client();
+const int initialize();
+const sockaddr_in create_ip_address();
+const int client();
 
 int main()
 {
@@ -16,7 +17,7 @@ int main()
     return 0;
 }
 
-int initialize() {
+const int initialize() {
     WSADATA data{};
     const auto version_requested = MAKEWORD(2, 0);
     // WSAStartupでWinsockの初期化を行う。
@@ -30,16 +31,24 @@ int initialize() {
 }
 
 const std::string server_ip = "127.0.0.1";
+constexpr int port = 8080;
 constexpr int address_family = AF_INET;
 constexpr int type = SOCK_STREAM;
 constexpr int protocol = IPPROTO_HOPOPTS;
-int client() {
+const sockaddr_in create_ip_address()
+{
     sockaddr_in addr{};
-    addr.sin_port = htons(8080);
+    addr.sin_port = htons(port);
     addr.sin_family = AF_INET;
 
     // IPアドレスをバイナリ形式に変換
     inet_pton(addr.sin_family, server_ip.c_str(), &addr.sin_addr);
+
+    return addr;
+}
+
+const int client() {
+    const auto addr = create_ip_address();
 
     const SOCKET sock = socket(address_family, type, protocol);
     if (sock == INVALID_SOCKET) {

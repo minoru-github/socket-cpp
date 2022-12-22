@@ -147,12 +147,13 @@ const int send_msg(
     const SOCKET sock,
     const std::string msg
 ) {
-    const int error = send(sock, msg.c_str(), static_cast<int>(msg.length()), 0);
-    if (error == SOCKET_ERROR) {
+    const int res_send = send(sock, msg.c_str(), static_cast<int>(msg.length()), 0);
+    // res_sendは正常時は送信したバイト数
+    if (res_send == SOCKET_ERROR) {
         std::cerr << "can't send message. error: " + std::to_string(WSAGetLastError()) << std::endl;
         finalize_socket_communication(sock);
     }
-    return error;
+    return res_send;
 }
 
 const std::string receive_msg(
@@ -194,7 +195,7 @@ void client() {
     }
 
     const int err_send = send_msg(sock, "hello world\n");
-    if (err_send) {
+    if (err_send == SOCKET_ERROR) {
         return;
     }
 
@@ -234,6 +235,10 @@ void server() {
         const std::string msg = receive_msg(sock);
         if (msg.length() > 0) {
             std::cerr << "received msg: " + msg << std::endl;
+            const int err_send = send_msg(sock, "Thanks for your msg.\n");
+            if (err_send == SOCKET_ERROR) {
+                return;
+            }
         } else {
             break;
         }

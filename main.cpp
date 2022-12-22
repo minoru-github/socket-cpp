@@ -5,22 +5,33 @@
 
 #pragma comment(lib,"Ws2_32.lib")
 
-const int initialize();
+const int initialize_winsock();
+void finalize_socket_communication(const SOCKET sock);
 const sockaddr_in create_ip_address();
-const int create_connect(const SOCKET sock);
-const int client();
+const SOCKET create_socket();
+const int bind(const SOCKET listen_sock);
+const int listen(const SOCKET listen_sock);
+const SOCKET accept(const SOCKET listen_sock);
+const int connect_to_server(const SOCKET sock);
+void server();
+void client();
+
+const int send_msg(
+    const SOCKET sock,
+    const std::string msg
+);
 
 int main()
 {
-    const int err_initialize = initialize();
-    const int err_client = client();
+    server();
+   // client();
 
     return 0;
 }
 
-const int initialize() {
+const int initialize_winsock() {
     WSADATA data{};
-    const auto version_requested = MAKEWORD(2, 0);
+    const auto version_requested = MAKEWORD(2, 2);
     // WSAStartupでWinsockの初期化を行う。
     // Winsockアプリの最初にWSAStartupは行う必要がある。
     // https://learn.microsoft.com/ja-jp/windows/win32/winsock/initializing-winsock
@@ -31,13 +42,16 @@ const int initialize() {
     return err_startup;
 }
 
-const std::string server_ip = "127.0.0.1";
-constexpr int port = 8080;
-constexpr int address_family = AF_INET;
-constexpr int type = SOCK_STREAM;
-constexpr int protocol = IPPROTO_HOPOPTS;
+void finalize_socket_communication(const SOCKET sock) {
+    closesocket(sock);
+    WSACleanup();
+}
+
 const sockaddr_in create_ip_address()
 {
+    const std::string server_ip = "127.0.0.1";
+    constexpr int port = 8080;
+
     sockaddr_in addr{};
     addr.sin_port = htons(port);
     addr.sin_family = AF_INET;
@@ -48,49 +62,129 @@ const sockaddr_in create_ip_address()
     return addr;
 }
 
-const int create_connect(const SOCKET sock) {
+const int bind(const SOCKET listen_sock) {
     const auto addr = create_ip_address();
 
-    const auto namelen = sizeof(addr);
-    const int err_connect = connect(sock, (sockaddr*)&addr, static_cast<int>(namelen));
-    if (err_connect) {
-        std::cerr << "can't connect. error: " + std::to_string(err_connect);
+    const int error = bind(listen_sock, (sockaddr*)&addr, static_cast<int>(sizeof(addr)));
+    if (error == SOCKET_ERROR) {
+        std::cerr << "can't bind. error: " + std::to_string(WSAGetLastError());
+        finalize_socket_communication(listen_sock);
     }
-    return err_connect;
+    return error;
+}
+
+const SOCKET create_socket() {
+    constexpr int address_family = AF_INET;
+    constexpr int type = SOCK_STREAM;
+    constexpr int protocol = IPPROTO_TCP;
+
+    const SOCKET sock = socket(address_family, type, protocol);
+    if (sock == INVALID_SOCKET) {
+        std::cerr << "can't create socket. error: " + std::to_string(WSAGetLastError());
+        WSACleanup();
+    }
+    return sock;
+}
+
+const int listen(const SOCKET listen_sock) {
+    // TODO 第二引数のbacklogの意味調べる
+    const int err = listen(listen_sock, 1);
+    if (err == SOCKET_ERROR) {
+        std::cerr << "can't listen. error: " + std::to_string(WSAGetLastError());
+        finalize_socket_communication(listen_sock);
+    }
+
+    return err;
+}
+
+const SOCKET accept(const SOCKET listen_sock) {
+    std::cerr << "Waiting for client to connect..." << std::endl;
+    const SOCKET accpet_socket = accept(listen_sock, NULL, NULL);
+    if (accpet_socket == INVALID_SOCKET) {
+        std::cerr << "can't accpet. error: " + std::to_string(WSAGetLastError());
+        finalize_socket_communication(listen_sock);
+    }
+    else {
+        std::cerr << "Client connected." << std::endl;
+    }
+    return accpet_socket;
+}
+
+const int connect_to_server(const SOCKET sock) {
+    const auto addr = create_ip_address();
+
+    const int error = connect(sock, (sockaddr*)&addr, static_cast<int>(sizeof(addr)));
+    if (error) {
+        std::cerr << "can't connect. error: " + std::to_string(WSAGetLastError());
+        finalize_socket_communication(sock);
+    }
+    return error;
 }
 
 const int send_msg(
     const SOCKET sock,
     const std::string msg
 ) {
-    const int err_send = send(sock, msg.c_str(), static_cast<int>(msg.length()), 0);
-    if (err_send == SOCKET_ERROR) {
-        std::cerr << "can't send message. error: " + std::to_string(err_send);
+    const int error = send(sock, msg.c_str(), static_cast<int>(msg.length()), 0);
+    if (error == SOCKET_ERROR) {
+        std::cerr << "can't send message. error: " + std::to_string(WSAGetLastError());
+        finalize_socket_communication(sock);
     }
-        return err_send;
+    return error;
 }
 
-const int client() {
 
-    const SOCKET sock = socket(address_family, type, protocol);
-    if (sock == INVALID_SOCKET) {
-        std::cerr << "can't create socket.";
-        return 1;
+void client() {
+    const int err_initialize = initialize_winsock();
+    if (err_initialize) {
+        return;
     }
 
-    const int err_connect = create_connect(sock);
+    const SOCKET sock = create_socket();
+    if (sock == INVALID_SOCKET) {
+        return;
+    }
+
+    const int err_connect = connect_to_server(sock);
     if (err_connect) {
-        return err_connect;
+        return;
     }
 
     const int err_send = send_msg(sock, "hello world\n");
     if (err_send) {
-        return err_send;
+        return;
     }
 
-    closesocket(sock);
+    finalize_socket_communication(sock);
 
-    WSACleanup();
+    return;
+}
 
-    return 0;
+void server() {
+    const int err_initialize = initialize_winsock();
+
+    // listener
+    const SOCKET listen_sock = create_socket();
+    if (listen_sock == INVALID_SOCKET) {
+        return;
+    }
+
+    const int err_bind = bind(listen_sock);
+    if (err_bind == SOCKET_ERROR) {
+        return;
+    }
+
+    const int err_listen = listen(listen_sock);
+    if (err_listen == SOCKET_ERROR) {
+        return;
+    }
+
+    const SOCKET accpet_socket = accept(listen_sock);
+    if (accpet_socket == INVALID_SOCKET) {
+        return;
+    }
+
+    finalize_socket_communication(listen_sock);
+
+    return;
 }

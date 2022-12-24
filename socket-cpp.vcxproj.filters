@@ -13,10 +13,21 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="ソース ファイル\socket">
+      <UniqueIdentifier>{f08d048c-6a88-47ca-89b7-7cf3bb2d4327}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\socket\tcp.cpp">
+      <Filter>ソース ファイル\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\socket\tcp.h">
+      <Filter>ソース ファイル\socket</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

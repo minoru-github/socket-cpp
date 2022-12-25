@@ -2,6 +2,9 @@
 
 #include <iostream>
 
+// SocketClient::connect()内で<winsock2.h>内のconnet(...)を使おうとすると、
+// SocketClient::connect()のconnectと名前が衝突してエラーになるので、
+// new typeして回避
 auto winsock2_connect = connect;
 
 namespace communication

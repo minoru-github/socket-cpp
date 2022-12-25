@@ -3,6 +3,10 @@
 #include <iostream>
 #include <ws2tcpip.h>
 
+// SocketTCP::socket()内で<winsock2.h>内のsocket(...)を使おうとすると、
+// SocketTCP::socket()のsocketと名前が衝突してエラーになるので、
+// new typeして回避。
+// その他も同様。
 auto winsock2_socket = socket;
 auto winsock2_receive = recv;
 auto winsock2_send = send;

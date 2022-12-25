@@ -2,6 +2,10 @@
 
 #include <iostream>
 
+// SocketServer::bind()内で<winsock2.h>内のbind(...)を使おうとすると、
+// SocketServer::bind()のbindと名前が衝突してエラーになるので、
+// new typeして回避。
+// その他も同様。
 auto winsock2_bind = bind;
 auto winsock2_litsen = listen;
 auto winsock2_accept = accept;

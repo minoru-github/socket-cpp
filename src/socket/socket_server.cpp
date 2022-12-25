@@ -1,6 +1,7 @@
 #include "socket_server.h"
 
 #include <iostream>
+#include <winsock2.h>
 
 // SocketServer::bind()内で<winsock2.h>内のbind(...)を使おうとすると、
 // SocketServer::bind()のbindと名前が衝突してエラーになるので、

@@ -1,6 +1,7 @@
 #include "socket_client.h"
 
 #include <iostream>
+#include <winsock2.h>
 
 // SocketClient::connect()内で<winsock2.h>内のconnet(...)を使おうとすると、
 // SocketClient::connect()のconnectと名前が衝突してエラーになるので、

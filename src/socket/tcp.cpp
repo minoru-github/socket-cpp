@@ -88,6 +88,14 @@ namespace communication
         }
     }
 
+    Server::Server()
+    {
+    }
+
+    Server::~Server()
+    {
+    }
+
     void Server::bind()
     {
         const auto addr = this->create_ip_address();
@@ -125,6 +133,14 @@ namespace communication
             closesocket(listen_sock);
             this->sock = accept_sock;
         }
+    }
+
+    Client::Client()
+    {
+    }
+
+    Client::~Client()
+    {
     }
 
     void Client::connect()

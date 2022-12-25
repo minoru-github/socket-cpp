@@ -10,15 +10,15 @@ namespace communication {
     constexpr size_t recvbuflen = 512;
 
     class SocketTCP {
+    protected:
         SocketTCP();
         ~SocketTCP();
-
-        char recvbuf[recvbuflen] = { 0 };
-    public:
-        void socket();
         SOCKET sock;
+        char recvbuf[recvbuflen] = { 0 };
         const sockaddr_in create_ip_address();
 
+    public:
+        void socket();
         const std::string receive();
         void send(const std::string msg);
     };

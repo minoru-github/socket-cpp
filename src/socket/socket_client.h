@@ -2,9 +2,11 @@
 
 #include "socket_tcp.h"
 
-namespace communication {
+namespace communication
+{
 
-    class SocketClient : public SocketTCP {
+    class SocketClient : public SocketTCP
+    {
     public:
         SocketClient();
         ~SocketClient();

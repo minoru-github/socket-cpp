@@ -16,14 +16,16 @@ int main()
     return 0;
 }
 
-void run_client() {
+void run_client()
+{
     auto client = SocketClient();
     client.socket();
     client.connect();
     client.send("hello world\n");
 }
 
-void run_server() {
+void run_server()
+{
     auto server = SocketServer();
     server.socket();
     server.bind();

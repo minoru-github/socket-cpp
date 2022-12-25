@@ -5,10 +5,12 @@
 
 #pragma comment(lib,"Ws2_32.lib")
 
-namespace communication {
+namespace communication
+{
     constexpr size_t recvbuflen = 512;
 
-    class SocketTCP {
+    class SocketTCP
+    {
     protected:
         SocketTCP();
         ~SocketTCP();

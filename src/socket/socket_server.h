@@ -8,8 +8,7 @@ namespace communication
     class SocketServer : public SocketTCP
     {
     public:
-        SocketServer();
-        ~SocketServer();
+        using SocketTCP::SocketTCP;
 
         void bind();
         void listen();

@@ -14,14 +14,6 @@ auto winsock2_accept = accept;
 namespace communication
 {
 
-    SocketServer::SocketServer()
-    {
-    }
-
-    SocketServer::~SocketServer()
-    {
-    }
-
     void SocketServer::bind()
     {
         const auto addr = this->create_ip_address();

@@ -8,8 +8,7 @@ namespace communication
     class SocketClient : public SocketTCP
     {
     public:
-        SocketClient();
-        ~SocketClient();
+        using SocketTCP::SocketTCP;
 
         void connect();
     };

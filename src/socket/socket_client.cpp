@@ -11,14 +11,6 @@ auto winsock2_connect = connect;
 namespace communication
 {
 
-    SocketClient::SocketClient()
-    {
-    }
-
-    SocketClient::~SocketClient()
-    {
-    }
-
     void SocketClient::connect()
     {
         const auto addr = create_ip_address();

@@ -16,6 +16,8 @@ namespace communication
 
     SocketTCP::SocketTCP()
     {
+        std::cerr << "start of socket communication." << std::endl;
+
         WSADATA data{};
         const auto version_requested = MAKEWORD(2, 2);
         // WSAStartup‚ÅWinsock‚Ì‰Šú‰»‚ðs‚¤B
@@ -30,6 +32,8 @@ namespace communication
     {
         closesocket(this->sock);
         WSACleanup();
+
+        std::cerr << "end of socket communication." << std::endl;
     };
 
     void SocketTCP::socket()

@@ -2,22 +2,38 @@
 
 #include <iostream>
 #include <winsock2.h>
-#include <ws2tcpip.h>
 #include <string>
 
 #pragma comment(lib,"Ws2_32.lib")
 
-class tcp
-{
-    const int initialize_winsock();
-    void finalize_socket_communication(
-        const SOCKET sock
-    );
-    const sockaddr_in create_ip_address();
-    const SOCKET create_socket();
-    const int bind(
-        const SOCKET listen_sock
-    );
+namespace communication {
+    constexpr size_t recvbuflen = 512;
+
+    class SocketTCP {
+        SocketTCP();
+        ~SocketTCP();
+
+        char recvbuf[recvbuflen] = { 0 };
+    public:
+        void socket();
+        SOCKET sock;
+        const sockaddr_in create_ip_address();
+
+        const std::string receive();
+        void send(const std::string msg);
+    };
+
+    class Server : public SocketTCP {
+    public:
+        Server();
+        ~Server();
+
+        void bind();
+        void listen();
+        void accept();
+    };
+
+
     const int listen(
         const SOCKET listen_sock
     );
@@ -27,8 +43,6 @@ class tcp
     const int connect_to_server(
         const SOCKET sock
     );
-    void server();
-    void client();
 
     const int send_msg(
         const SOCKET sock,
@@ -37,5 +51,4 @@ class tcp
     const std::string receive_msg(
         const SOCKET sock
     );
-};
-
+} // namespace communication

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream>
 #include <winsock2.h>
 #include <string>
 
@@ -23,21 +22,4 @@ namespace communication {
         void send(const std::string msg);
     };
 
-    class Server : public SocketTCP {
-    public:
-        Server();
-        ~Server();
-
-        void bind();
-        void listen();
-        void accept();
-    };
-
-    class Client : public SocketTCP {
-    public:
-        Client();
-        ~Client();
-
-        void connect();
-    };
 } // namespace communication

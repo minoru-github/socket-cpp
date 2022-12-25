@@ -1,4 +1,7 @@
-﻿#include "socket/tcp.h"
+﻿#include <iostream>
+
+#include "socket/socket_server.h"
+#include "socket/socket_client.h"
 
 void run_server();
 void run_client();
@@ -14,14 +17,14 @@ int main()
 }
 
 void run_client() {
-    auto client = Client();
+    auto client = SocketClient();
     client.socket();
     client.connect();
     client.send("hello world\n");
 }
 
 void run_server() {
-    auto server = Server();
+    auto server = SocketServer();
     server.socket();
     server.bind();
     server.listen();

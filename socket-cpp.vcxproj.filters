@@ -24,9 +24,21 @@
     <ClCompile Include="src\main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="src\socket\socket_server.cpp">
+      <Filter>ソース ファイル\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="src\socket\socket_client.cpp">
+      <Filter>ソース ファイル\socket</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\socket\tcp.h">
+      <Filter>ソース ファイル\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="src\socket\socket_server.h">
+      <Filter>ソース ファイル\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="src\socket\socket_client.h">
       <Filter>ソース ファイル\socket</Filter>
     </ClInclude>
   </ItemGroup>

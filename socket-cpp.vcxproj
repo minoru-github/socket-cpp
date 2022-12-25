@@ -20,9 +20,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\socket\socket_client.cpp" />
+    <ClCompile Include="src\socket\socket_server.cpp" />
     <ClCompile Include="src\socket\tcp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\socket\socket_client.h" />
+    <ClInclude Include="src\socket\socket_server.h" />
     <ClInclude Include="src\socket\tcp.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -33,22 +33,11 @@ namespace communication {
         void accept();
     };
 
+    class Client : public SocketTCP {
+    public:
+        Client();
+        ~Client();
 
-    const int listen(
-        const SOCKET listen_sock
-    );
-    const SOCKET accept(
-        const SOCKET listen_sock
-    );
-    const int connect_to_server(
-        const SOCKET sock
-    );
-
-    const int send_msg(
-        const SOCKET sock,
-        const std::string msg
-    );
-    const std::string receive_msg(
-        const SOCKET sock
-    );
+        void connect();
+    };
 } // namespace communication

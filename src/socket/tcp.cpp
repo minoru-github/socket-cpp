@@ -7,6 +7,7 @@ auto winsock2_litsen = listen;
 auto winsock2_accept = accept;
 auto winsock2_receive = recv;
 auto winsock2_send = send;
+auto winsock2_connect = connect;
 
 namespace communication
 {
@@ -126,16 +127,14 @@ namespace communication
         }
     }
 
-    const int connect_to_server(
-        const SOCKET sock
-    ) {
+    void Client::connect()
+    {
         const auto addr = create_ip_address();
 
-        const int error = connect(sock, (sockaddr*)&addr, static_cast<int>(sizeof(addr)));
+        const int error = winsock2_connect(this->sock, (sockaddr*)&addr, static_cast<int>(sizeof(addr)));
         if (error) {
             std::cerr << "can't connect. error: " + std::to_string(WSAGetLastError()) << std::endl;
-            finalize_socket_communication(sock);
+            //finalize_socket_communication(sock);
         }
-        return error;
     }
 } // namespace communication

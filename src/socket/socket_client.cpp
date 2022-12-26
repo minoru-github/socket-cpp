@@ -18,7 +18,7 @@ namespace communication
         const int error = winsock2_connect(this->sock, (sockaddr*)&addr, static_cast<int>(sizeof(addr)));
         if (error) {
             std::cerr << "can't connect. error: " + std::to_string(WSAGetLastError()) << std::endl;
-            //finalize_socket_communication(sock);
+            throw Error::Connect;
         }
     }
 

@@ -26,6 +26,7 @@ namespace communication
         const int err_startup = WSAStartup(version_requested, &data);
         if (err_startup) {
             std::cerr << "can't startup. error: " + std::to_string(err_startup) << std::endl;
+            throw Error::Construct;
         }
     };
     SocketTCP::~SocketTCP()
@@ -46,7 +47,7 @@ namespace communication
 
         if (sock == INVALID_SOCKET) {
             std::cerr << "can't create socket. error: " + std::to_string(WSAGetLastError()) << std::endl;
-            WSACleanup();
+            throw Error::Socket;
         }
 
         this->sock = sock;
@@ -62,7 +63,11 @@ namespace communication
         addr.sin_family = AF_INET;
 
         // IPアドレスをバイナリ形式に変換
-        inet_pton(addr.sin_family, server_ip.c_str(), &addr.sin_addr);
+        const int err = inet_pton(addr.sin_family, server_ip.c_str(), &addr.sin_addr);
+        if (err != 1) {
+            std::cerr << "can't create ip address. error: " + std::to_string(WSAGetLastError()) << std::endl;
+            throw Error::IpAddress;
+        }
 
         return addr;
     }
@@ -72,12 +77,9 @@ namespace communication
         // TODO 汎用性高める
         const int received_size = winsock2_receive(this->sock, this->recvbuf, recvbuflen, 0);
 
-        if (received_size == 0) {
-            //finalize_socket_communication(sock);
-        }
-        else if (received_size < 0) {
+        if (received_size < 0) {
             std::cerr << "can't receive message. error: " + std::to_string(WSAGetLastError()) << std::endl;
-            //finalize_socket_communication(sock);
+            throw Error::Receive;
         }
 
         const std::string msg = recvbuf;
@@ -90,7 +92,7 @@ namespace communication
         // res_sendは正常時は送信したバイト数
         if (res_send == SOCKET_ERROR) {
             std::cerr << "can't send message. error: " + std::to_string(WSAGetLastError()) << std::endl;
-            //finalize_socket_communication(sock);
+            throw Error::Send;
         }
     }
 

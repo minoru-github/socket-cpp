@@ -14,7 +14,7 @@ namespace communication
     protected:
         SocketTCP();
         ~SocketTCP();
-        SOCKET sock;
+        SOCKET sock = INVALID_SOCKET;
         char recvbuf[recvbuflen] = { 0 };
         const sockaddr_in create_ip_address();
 
@@ -22,6 +22,19 @@ namespace communication
         void socket();
         const std::string receive();
         void send(const std::string msg);
+
+        enum class Error {
+            Construct,
+            Socket,
+            IpAddress,
+            Bind,
+            Listen,
+            Accpet,
+            Connect,
+            Send,
+            Receive,
+            Deconstruct,
+        };
     };
 
 } // namespace communication

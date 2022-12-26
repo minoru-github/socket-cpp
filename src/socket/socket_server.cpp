@@ -21,7 +21,7 @@ namespace communication
         const int error = winsock2_bind(this->sock, (sockaddr*)&addr, static_cast<int>(sizeof(addr)));
         if (error == SOCKET_ERROR) {
             std::cerr << "can't bind. error: " + std::to_string(WSAGetLastError()) << std::endl;
-            //finalize_socket_communication(listen_sock);
+            throw Error::Bind;
         }
     }
 
@@ -32,7 +32,7 @@ namespace communication
         const int err = winsock2_litsen(listen_sock, 1);
         if (err == SOCKET_ERROR) {
             std::cerr << "can't listen. error: " + std::to_string(WSAGetLastError()) << std::endl;
-            //finalize_socket_communication(listen_sock);
+            throw Error::Listen;
         }
     }
 
@@ -44,7 +44,7 @@ namespace communication
         const SOCKET accept_sock = winsock2_accept(listen_sock, NULL, NULL);
         if (accept_sock == INVALID_SOCKET) {
             std::cerr << "can't accpet. error: " + std::to_string(WSAGetLastError()) << std::endl;
-            //finalize_socket_communication(listen_sock);
+            throw Error::Accpet;
         }
         else {
             std::cerr << "Client connected." << std::endl;
